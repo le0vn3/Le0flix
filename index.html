@@ -47,16 +47,13 @@ header {
 }
 h2 {padding-left:10px;margin:10px 0;font-size:20px;text-shadow:1px1px3px #000;}
 .carousel-container {
-  display:flex;
-  flex-direction:column;
-  padding:0;
-  width:100%;
-  scroll-behavior:smooth;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+  gap:10px;
+  width:95%;
 }
 .movie-card {
-  width:100%;
-  margin:5px 0;
-  border-radius:0;
+  border-radius:12px;
   overflow:hidden;
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px);
@@ -82,14 +79,14 @@ h2 {padding-left:10px;margin:10px 0;font-size:20px;text-shadow:1px1px3px #000;}
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(8px);
   color:#fff;
-  padding:8px;
+  padding:6px 8px;
 }
 .overlay h3 {
   margin:0;
-  font-size:16px;
+  font-size:14px;
 }
 .overlay .duree {
-  font-size:12px;
+  font-size:11px;
   color:#ccc;
 }
 video {
@@ -97,8 +94,8 @@ video {
   display:block;
   background:#000;
   margin-top:5px;
+  border-radius:8px;
 }
-.carousel-container::-webkit-scrollbar {height:0px;}
 </style>
 </head>
 <body>
@@ -112,7 +109,6 @@ video {
 
 <script>
 let allMovies=[];
-
 fetch('./movies.json')
 .then(res=>res.json())
 .then(data=>{
@@ -148,9 +144,7 @@ function displayMovies(movies){
     const video = card.querySelector('video');
     card.addEventListener('mouseenter',()=>{ video.play(); });
     card.addEventListener('mouseleave',()=>{ video.pause(); video.currentTime=0; });
-    card.addEventListener('touchstart',()=>{ 
-      if(video.paused) video.play(); else video.pause(); 
-    });
+    card.addEventListener('touchstart',()=>{ if(video.paused) video.play(); else video.pause(); });
   });
 }
 
