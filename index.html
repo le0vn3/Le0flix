@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Le0flix Prototype Netflix</title>
+<title>Le0flix Prototype</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
@@ -14,19 +14,47 @@ body {
 
 header {
   display:flex;
-  justify-content:center;
-  padding:15px 0;
-  background: rgba(20,20,30,0.7);
-  backdrop-filter: blur(15px);
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 20px;
+  background: rgba(20,20,30,0.85);
+  backdrop-filter: blur(12px);
   position:sticky;
   top:0;
   z-index:10;
 }
 
 header img {
-  height:120px;
+  height:100px;
   object-fit:contain;
 }
+
+.search-bar {
+  flex:1;
+  margin:0 20px;
+}
+
+.search-bar input {
+  width:100%;
+  padding:8px 12px;
+  border-radius:20px;
+  border:none;
+  outline:none;
+  font-size:14px;
+}
+
+.settings-btn {
+  background: rgba(138,43,226,0.8);
+  border:none;
+  padding:8px 15px;
+  border-radius:20px;
+  color:#fff;
+  cursor:pointer;
+  font-weight:600;
+  transition: background 0.3s;
+}
+
+.settings-btn:hover {background: rgba(138,43,226,1);}
 
 h2 {
   margin:10px 0 5px 10px;
@@ -78,20 +106,25 @@ h2 {
   backdrop-filter:blur(4px);
   text-align:center;
 }
+
 </style>
 </head>
 <body>
 
 <header>
   <img src="https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png" alt="Le0flix">
+  <div class="search-bar">
+    <input id="search" placeholder="Rechercher un film...">
+  </div>
+  <button class="settings-btn">Paramètres</button>
 </header>
 
 <div id="categories"></div>
 
 <script>
-// Générer des fausses données comme Netflix
+// Catégories et films factices
 const categories = [
-  "Action", "Animation", "Comédie", "Horreur", "Sci-Fi", "Aventure"
+  "Action","Animation","Comédie","Horreur","Sci-Fi","Aventure"
 ];
 
 const placeholderImages = [
@@ -107,34 +140,62 @@ const placeholderImages = [
   "https://picsum.photos/200/300?random=10"
 ];
 
-const container = document.getElementById("categories");
+let movieData = [];
 
 categories.forEach(cat=>{
-  const catDiv = document.createElement("div");
-  catDiv.className="category";
-  
-  const title = document.createElement("h2");
-  title.textContent=cat;
-  catDiv.appendChild(title);
-
-  const row = document.createElement("div");
-  row.className="row";
-
-  // Générer 10 films par catégorie
+  const films = [];
   for(let i=0;i<10;i++){
-    const card = document.createElement("div");
-    card.className="card";
-    const imgUrl = placeholderImages[Math.floor(Math.random()*placeholderImages.length)];
-    card.innerHTML = `
-      <img src="${imgUrl}" alt="${cat} Film">
-      <div class="overlay">${cat} Film ${i+1} • ${Math.floor(Math.random()*3+1)}h${Math.floor(Math.random()*60)}m</div>
-    `;
-    row.appendChild(card);
+    films.push({
+      titre:`${cat} Film ${i+1}`,
+      duree:`${Math.floor(Math.random()*3+1)}h${Math.floor(Math.random()*60)}m`,
+      image: placeholderImages[Math.floor(Math.random()*placeholderImages.length)]
+    });
   }
-
-  catDiv.appendChild(row);
-  container.appendChild(catDiv);
+  movieData.push({categorie:cat, films});
 });
+
+const container = document.getElementById("categories");
+
+function render(data){
+  container.innerHTML="";
+  data.forEach(cat=>{
+    const catDiv = document.createElement("div");
+    catDiv.className="category";
+    const title = document.createElement("h2");
+    title.textContent = cat.categorie;
+    catDiv.appendChild(title);
+    const row = document.createElement("div");
+    row.className="row";
+
+    cat.films.forEach(f=>{
+      const card = document.createElement("div");
+      card.className="card";
+      card.innerHTML = `
+        <img src="${f.image}" alt="${f.titre}">
+        <div class="overlay">${f.titre} • ${f.duree}</div>
+      `;
+      row.appendChild(card);
+    });
+
+    catDiv.appendChild(row);
+    container.appendChild(catDiv);
+  });
+}
+
+// Filtrage recherche
+document.getElementById("search").addEventListener("input", e=>{
+  const q = e.target.value.toLowerCase();
+  const filtered = movieData.map(cat=>{
+    return {
+      categorie: cat.categorie,
+      films: cat.films.filter(f=>f.titre.toLowerCase().includes(q))
+    };
+  }).filter(cat=>cat.films.length>0);
+  render(filtered);
+});
+
+// Initial render
+render(movieData);
 </script>
 
 </body>
