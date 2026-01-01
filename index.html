@@ -8,7 +8,7 @@
 body {
   margin:0;
   font-family:'Arial',sans-serif;
-  background: linear-gradient(135deg,#0f0f0f,#1a1a1a);
+  background: linear-gradient(to bottom, #8a2be2, #000); /* violet en haut → noir en bas */
   color:#fff;
   display:flex;
   flex-direction:column;
@@ -16,11 +16,11 @@ body {
 }
 header {
   width:100%;
-  padding:15px 0;
+  padding:20px 0; /* plus grand pour le logo */
   display:flex;
   justify-content:center;
   align-items:center;
-  background: rgba(30,30,30,0.6);
+  background: rgba(30,30,30,0.3);
   backdrop-filter: blur(10px);
   box-shadow:0 2px 10px rgba(0,0,0,0.5);
   position: sticky;
@@ -29,7 +29,7 @@ header {
 }
 header .logo img {
   display:block;
-  height:40px; /* ajuster la taille du logo */
+  height:80px; /* logo plus grand */
   object-fit:contain;
 }
 #search {
