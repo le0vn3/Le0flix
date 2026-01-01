@@ -2,121 +2,82 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Le0flix</title>
+<title>Le0flix Prototype</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-html, body {
+body {
   margin:0;
-  padding:0;
-  font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  font-family:Arial,sans-serif;
   background: linear-gradient(to bottom, #4b1f7f, #000);
   color:#fff;
-  min-height:100vh;
-  overflow-x:hidden;
 }
 
 header {
-  width:100%;
-  padding:20px 0;
   display:flex;
   justify-content:center;
-  background: rgba(20,20,30,0.75);
-  backdrop-filter: blur(15px) saturate(180%);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  position: sticky;
+  padding:15px 0;
+  background: rgba(20,20,30,0.7);
+  backdrop-filter: blur(15px);
+  position:sticky;
   top:0;
-  z-index:100;
-  box-shadow:0 6px 30px rgba(0,0,0,0.3);
+  z-index:10;
 }
 
 header img {
-  height:130px; /* logo agrandi */
+  height:120px;
   object-fit:contain;
-  filter: drop-shadow(0 0 20px rgba(138,43,226,0.5));
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-header img:hover {
-  transform: scale(1.05);
-  filter: drop-shadow(0 0 30px rgba(138,43,226,0.7));
 }
 
-.search-wrapper {
-  width:95%;
-  max-width:600px;
-  margin:20px auto;
-  position:relative;
+h2 {
+  margin-left:10px;
+  font-size:18px;
 }
 
-#search {
-  width:100%;
-  padding:15px 45px;
-  border-radius:25px;
-  border:none;
-  outline:none;
-  background: rgba(255,255,255,0.1);
-  color:#fff;
-  font-size:14px;
-  backdrop-filter: blur(10px);
+.category {
+  margin:20px 0;
 }
 
-#search::placeholder {color: rgba(255,255,255,0.5);}
-
-.search-icon {
-  position:absolute;
-  left:15px;
-  top:50%;
-  transform:translateY(-50%);
-  color: rgba(255,255,255,0.6);
-  pointer-events:none;
+.row {
+  display:flex;
+  overflow-x:auto;
+  gap:10px;
+  padding:0 10px;
 }
 
-.container {
-  width:95%;
-  max-width:1100px;
-  display:grid;
-  grid-template-columns: repeat(2,1fr);
-  gap:15px;
-  margin:20px auto 50px;
-}
+.row::-webkit-scrollbar {height:6px;}
+.row::-webkit-scrollbar-thumb {background:#8a2be2;border-radius:3px;}
 
 .card {
+  min-width:180px;
+  height:270px;
   position:relative;
-  border-radius:15px;
+  border-radius:12px;
   overflow:hidden;
-  cursor:pointer;
   background: rgba(255,255,255,0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  aspect-ratio: 2/3;
-}
-
-.card:hover {
-  transform: scale(1.03);
-  box-shadow:0 15px 40px rgba(138,43,226,0.4);
+  cursor:pointer;
+  flex:0 0 auto;
 }
 
 .card img {
   width:100%;
   height:100%;
   object-fit:cover;
-  display:block;
-  opacity:0;
-  transition: opacity 0.5s ease, transform 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
-.card img.loaded {opacity:1;}
+.card:hover img {
+  transform:scale(1.05);
+}
 
 .overlay {
   position:absolute;
   bottom:0;
   width:100%;
-  padding:10px;
+  padding:6px;
   font-size:12px;
-  font-weight:600;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(6px);
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px);
   text-align:center;
-  color:#fff;
 }
 
 .card video {
@@ -128,81 +89,63 @@ header img:hover {
   display:none;
 }
 
-.card:hover video {display:block;}
-
-@media (max-width:768px){
-  .container {grid-template-columns: repeat(2,1fr);}
-  header img {height:100px;}
-  #search {padding:12px 40px;}
-  .overlay {font-size:11px;}
-}
-
-@media (max-width:480px){
-  .container {grid-template-columns: 1fr;}
-  header img {height:80px;}
+.card:hover video {
+  display:block;
 }
 </style>
 </head>
-
 <body>
 
 <header>
   <img src="https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png" alt="Le0flix">
 </header>
 
-<div class="search-wrapper">
-  <input id="search" placeholder="Rechercher un film...">
-  <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-    <circle cx="11" cy="11" r="8"></circle>
-    <path d="m21 21-4.35-4.35"></path>
-  </svg>
-</div>
-
-<div class="container" id="list"></div>
+<div id="categories"></div>
 
 <script>
-let movies = [];
+// Exemple JSON
+const data = [
+  {categorie:"Action", films:[
+    {titre:"Avengers", duree:"2h23", lien:"https://drive.google.com/uc?export=download&id=ID_AVENGERS", image:"https://i.ibb.co/WSYGkWV/t-l-chargement.png"},
+    {titre:"Spider-Man", duree:"2h28", lien:"https://drive.google.com/uc?export=download&id=ID_SPIDER", image:"https://i.ibb.co/T8zZfg7/spiderman.jpg"},
+    {titre:"Batman", duree:"2h15", lien:"https://drive.google.com/uc?export=download&id=ID_BATMAN", image:"https://i.ibb.co/XYZ/batman.jpg"}
+  ]},
+  {categorie:"Animation", films:[
+    {titre:"Toy Story 4", duree:"1h40", lien:"https://drive.google.com/uc?export=download&id=ID_TOY4", image:"https://i.ibb.co/FbLZxNR/toystory4.jpg"},
+    {titre:"Zootopie 2", duree:"1h50", lien:"https://drive.google.com/uc?export=download&id=ID_ZOOTOPIE", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png"}
+  ]}
+];
 
-fetch("movies.json")
-  .then(r => r.json())
-  .then(data => {movies=data; render(movies);})
-  .catch(err => {
-    console.error("Erreur:",err);
-    document.getElementById("list").innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(255,255,255,0.6)">Erreur de chargement des films</div>';
-  });
+const container = document.getElementById("categories");
 
-function render(arr){
-  const box=document.getElementById("list");
-  box.innerHTML="";
-  if(arr.length===0){
-    box.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:rgba(255,255,255,0.6)">Aucun film trouvé</div>';
-    return;
-  }
-  arr.forEach(m=>{
-    const card=document.createElement("div");
+data.forEach(cat=>{
+  const catDiv = document.createElement("div");
+  catDiv.className="category";
+  const title = document.createElement("h2");
+  title.textContent=cat.categorie;
+  catDiv.appendChild(title);
+
+  const row = document.createElement("div");
+  row.className="row";
+
+  cat.films.forEach(f=>{
+    const card = document.createElement("div");
     card.className="card";
     card.innerHTML=`
-      <img src="${m.image}" alt="${m.titre}">
-      <div class="overlay">${m.titre} • ${m.duree}</div>
-      <video muted loop preload="none"><source src="${m.lien}" type="video/mp4"></video>
+      <img src="${f.image}" alt="${f.titre}">
+      <div class="overlay">${f.titre} • ${f.duree}</div>
+      <video muted loop preload="none">
+        <source src="${f.lien}" type="video/mp4">
+      </video>
     `;
-    box.appendChild(card);
-
-    const img=card.querySelector("img");
-    img.onload=()=>img.classList.add("loaded");
-    img.onerror=()=>img.classList.add("loaded");
-
-    const v=card.querySelector("video");
-    let timeout;
-    card.onmouseenter=()=>{timeout=setTimeout(()=>{v.play().catch(()=>{})},200)};
-    card.onmouseleave=()=>{clearTimeout(timeout);v.pause();v.currentTime=0};
-    card.ontouchstart=(e)=>{e.preventDefault(); if(v.paused)v.play().catch(()=>{}); else{v.pause();v.currentTime=0}};
+    const video = card.querySelector("video");
+    card.onmouseenter = ()=>{video.play().catch(()=>{});}
+    card.onmouseleave = ()=>{video.pause(); video.currentTime=0;}
+    row.appendChild(card);
   });
-}
 
-document.getElementById("search").addEventListener("input",e=>{
-  const q=e.target.value.toLowerCase();
-  render(movies.filter(m=>m.titre.toLowerCase().includes(q)));
+  catDiv.appendChild(row);
+  container.appendChild(catDiv);
 });
 </script>
 
