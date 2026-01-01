@@ -71,23 +71,19 @@ h2 {padding-left:10px;margin:10px 0;font-size:20px;text-shadow:1px1px3px #000;}
   object-fit:cover;
   display:block;
 }
-.overlay {
+.tag-top {
   position:absolute;
-  bottom:0;
-  left:0;
-  width:100%;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(8px);
+  top:8px;
+  left:50%;
+  transform:translateX(-50%);
+  background: rgba(0,0,0,0.6);
+  padding:3px 8px;
+  border-radius:12px;
+  font-size:12px;
   color:#fff;
-  padding:6px 8px;
-}
-.overlay h3 {
-  margin:0;
-  font-size:14px;
-}
-.overlay .duree {
-  font-size:11px;
-  color:#ccc;
+  text-align:center;
+  backdrop-filter: blur(5px);
+  z-index:10;
 }
 video {
   width:100%;
@@ -132,10 +128,7 @@ function displayMovies(movies){
     card.className='movie-card';
     card.innerHTML=`
       ${movie.image?`<img src="${movie.image}" alt="${movie.titre}">`:''}
-      <div class="overlay">
-        <h3>${movie.titre}</h3>
-        <div class="duree">${movie.duree}</div>
-      </div>
+      <div class="tag-top">${movie.titre} • ${movie.duree}</div>
       <video muted loop>
         <source src="${movie.lien}" type="video/mp4">
       </video>
