@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Le0flix Prototype</title>
+<title>Le0flix Prototype Netflix</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
   margin:0;
   font-family:Arial,sans-serif;
-  background: linear-gradient(to bottom, #4b1f7f, #000);
+  background: linear-gradient(to bottom,#4b1f7f,#000);
   color:#fff;
 }
 
@@ -29,12 +29,12 @@ header img {
 }
 
 h2 {
-  margin-left:10px;
+  margin:10px 0 5px 10px;
   font-size:18px;
 }
 
 .category {
-  margin:20px 0;
+  margin-bottom:20px;
 }
 
 .row {
@@ -48,49 +48,35 @@ h2 {
 .row::-webkit-scrollbar-thumb {background:#8a2be2;border-radius:3px;}
 
 .card {
-  min-width:180px;
-  height:270px;
+  min-width:150px;
+  height:225px;
   position:relative;
   border-radius:12px;
   overflow:hidden;
   background: rgba(255,255,255,0.05);
   cursor:pointer;
   flex:0 0 auto;
+  transition: transform 0.3s ease;
 }
+
+.card:hover {transform:scale(1.05);}
 
 .card img {
   width:100%;
   height:100%;
   object-fit:cover;
-  transition: transform 0.3s ease;
-}
-
-.card:hover img {
-  transform:scale(1.05);
+  display:block;
 }
 
 .overlay {
   position:absolute;
   bottom:0;
   width:100%;
-  padding:6px;
+  padding:5px;
   font-size:12px;
-  background:rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.5);
   backdrop-filter:blur(4px);
   text-align:center;
-}
-
-.card video {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:none;
-}
-
-.card:hover video {
-  display:block;
 }
 </style>
 </head>
@@ -103,46 +89,48 @@ h2 {
 <div id="categories"></div>
 
 <script>
-// Exemple JSON
-const data = [
-  {categorie:"Action", films:[
-    {titre:"Avengers", duree:"2h23", lien:"https://drive.google.com/uc?export=download&id=ID_AVENGERS", image:"https://i.ibb.co/WSYGkWV/t-l-chargement.png"},
-    {titre:"Spider-Man", duree:"2h28", lien:"https://drive.google.com/uc?export=download&id=ID_SPIDER", image:"https://i.ibb.co/T8zZfg7/spiderman.jpg"},
-    {titre:"Batman", duree:"2h15", lien:"https://drive.google.com/uc?export=download&id=ID_BATMAN", image:"https://i.ibb.co/XYZ/batman.jpg"}
-  ]},
-  {categorie:"Animation", films:[
-    {titre:"Toy Story 4", duree:"1h40", lien:"https://drive.google.com/uc?export=download&id=ID_TOY4", image:"https://i.ibb.co/FbLZxNR/toystory4.jpg"},
-    {titre:"Zootopie 2", duree:"1h50", lien:"https://drive.google.com/uc?export=download&id=ID_ZOOTOPIE", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png"}
-  ]}
+// Générer des fausses données comme Netflix
+const categories = [
+  "Action", "Animation", "Comédie", "Horreur", "Sci-Fi", "Aventure"
+];
+
+const placeholderImages = [
+  "https://picsum.photos/200/300?random=1",
+  "https://picsum.photos/200/300?random=2",
+  "https://picsum.photos/200/300?random=3",
+  "https://picsum.photos/200/300?random=4",
+  "https://picsum.photos/200/300?random=5",
+  "https://picsum.photos/200/300?random=6",
+  "https://picsum.photos/200/300?random=7",
+  "https://picsum.photos/200/300?random=8",
+  "https://picsum.photos/200/300?random=9",
+  "https://picsum.photos/200/300?random=10"
 ];
 
 const container = document.getElementById("categories");
 
-data.forEach(cat=>{
+categories.forEach(cat=>{
   const catDiv = document.createElement("div");
   catDiv.className="category";
+  
   const title = document.createElement("h2");
-  title.textContent=cat.categorie;
+  title.textContent=cat;
   catDiv.appendChild(title);
 
   const row = document.createElement("div");
   row.className="row";
 
-  cat.films.forEach(f=>{
+  // Générer 10 films par catégorie
+  for(let i=0;i<10;i++){
     const card = document.createElement("div");
     card.className="card";
-    card.innerHTML=`
-      <img src="${f.image}" alt="${f.titre}">
-      <div class="overlay">${f.titre} • ${f.duree}</div>
-      <video muted loop preload="none">
-        <source src="${f.lien}" type="video/mp4">
-      </video>
+    const imgUrl = placeholderImages[Math.floor(Math.random()*placeholderImages.length)];
+    card.innerHTML = `
+      <img src="${imgUrl}" alt="${cat} Film">
+      <div class="overlay">${cat} Film ${i+1} • ${Math.floor(Math.random()*3+1)}h${Math.floor(Math.random()*60)}m</div>
     `;
-    const video = card.querySelector("video");
-    card.onmouseenter = ()=>{video.play().catch(()=>{});}
-    card.onmouseleave = ()=>{video.pause(); video.currentTime=0;}
     row.appendChild(card);
-  });
+  }
 
   catDiv.appendChild(row);
   container.appendChild(catDiv);
