@@ -5,197 +5,158 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le0Flix</title>
 <style>
-:root{
-  --bg1:#1b0836;
-  --bg2:#2d0b59;
-  --bg3:#000;
+:root {
+  --bg1: #1b0836;
+  --bg2: #2d0b59;
+  --bg3: #000;
 }
-body{margin:0;font-family:system-ui, sans-serif;background:linear-gradient(to bottom,var(--bg1),var(--bg2),var(--bg3));color:#fff;overflow-x:hidden;}
-
-/* LOADING SCREEN */
-#loadingScreen{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#000;z-index:999;flex-direction:column;}
-#loadingScreen img{height:120px;animation:logoAnim 2s infinite alternate;}
-@keyframes logoAnim{0%{transform:scale(0.9)}100%{transform:scale(1.1)}}
-
-/* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;position:sticky;top:0;background:var(--bg1);z-index:100;}
-header img#logo{height:80px;cursor:pointer;}
-.header-buttons{display:flex;align-items:center;gap:10px;}
-.header-buttons div{cursor:pointer;font-size:22px;user-select:none;transition:transform 0.2s;}
-.header-buttons div:hover{transform:scale(1.2);}
-
-/* SEARCH */
-#search{width:90%;max-width:500px;margin:10px auto 20px;display:block;padding:12px 18px;border-radius:25px;border:none;font-size:16px;}
-
-/* GRID */
-#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;padding:20px;}
-.card{border-radius:14px;overflow:hidden;position:relative;cursor:pointer;background:#111;transition:all 0.3s ease;}
-.card img{width:100%;height:100%;object-fit:cover;}
-.card .info{position:absolute;bottom:0;width:100%;padding:6px;font-size:13px;background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);}
-.card .heart{position:absolute;top:6px;right:6px;font-size:20px;color:black;cursor:pointer;transition:color 0.3s;}
-.card .heart.red{color:red;}
-
-/* SKELETON */
-.skeleton{background: linear-gradient(90deg,#222,#333,#222);background-size:200% 100%;animation: shimmer 1.2s infinite;aspect-ratio:2/3;border-radius:14px;}
-@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
-
-/* PLAYER */
-#playerPage{display:none;position:fixed;inset:0;background:#000;z-index:50;flex-direction:column;align-items:center;justify-content:center;}
-#back{padding:10px;font-size:22px;cursor:pointer;color:white;position:absolute;top:10px;left:10px;z-index:51;}
-video#player{width:100%;height:100%;object-fit:contain;}
-
-/* RESPONSIVE */
-@media(max-width:768px){
-  header img#logo{height:60px;}
-  #grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+body {
+  margin:0; font-family:system-ui; background:linear-gradient(to bottom,var(--bg1),var(--bg2),var(--bg3)); color:#fff; overflow-x:hidden;
 }
+header {
+  display:flex; align-items:center; justify-content:space-between; padding:15px 20px; position:sticky; top:0; background:var(--bg2); z-index:100;
+}
+header img { height:100px; cursor:pointer; }
+header .buttons { display:flex; gap:15px; align-items:center; }
+header .buttons div { cursor:pointer; font-size:18px; }
+#search { width:90%; max-width:500px; margin:10px auto; display:block; padding:12px 18px; border-radius:25px; border:none; font-size:16px; }
+#grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; padding:20px; }
+.card { border-radius:14px; overflow:hidden; position:relative; cursor:pointer; background:#111; transition:all 0.3s; }
+.card:hover { transform:scale(1.03); }
+.card img { width:100%; height:200px; object-fit:cover; }
+.card .info { position:absolute; bottom:0; width:100%; padding:6px; font-size:13px; background:linear-gradient(to top,rgba(0,0,0,.8),transparent); display:flex; justify-content:space-between; align-items:center; }
+.card .heart { cursor:pointer; font-size:18px; margin-left:5px; }
+.card .progress { position:absolute; bottom:0; left:0; height:4px; background:red; width:0%; border-radius:2px; transition:width 0.2s; }
+#playerPage { display:none; position:fixed; inset:0; background:#000; z-index:200; flex-direction:column; }
+#playerPage video { width:100%; height:100%; object-fit:contain; }
+.skeleton { background:linear-gradient(90deg,#222,#333,#222); background-size:200% 100%; animation:shimmer 1.4s infinite; aspect-ratio:2/3; border-radius:14px; }
+@keyframes shimmer { 0%{background-position:200%} 100%{background-position:-200%} }
+@media(min-width:768px){ #grid { grid-template-columns:repeat(4,1fr); } }
 </style>
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
-<div id="loadingScreen">
-  <img src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png" alt="Logo">
-</div>
-
-<header id="header">
-  <img id="logo" src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png" alt="Logo">
-  <div class="header-buttons">
-    <div id="favBtn">❤️</div>
-    <div id="histBtn">🕒</div>
+<header>
+  <img id="logo" src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png">
+  <div class="buttons">
+    <div id="favoritesBtn">❤️ Favoris</div>
+    <div id="historyBtn">📜 Historique</div>
   </div>
 </header>
 
 <input id="search" placeholder="Rechercher un film...">
+
 <div id="grid"></div>
 
-<!-- PLAYER -->
 <div id="playerPage">
-  <div id="back">⬅ Retour</div>
   <video id="player" controls playsinline></video>
 </div>
 
 <script>
-// LOADING SCREEN
-setTimeout(()=>{document.getElementById("loadingScreen").style.display="none";},4000);
+let movies=[], displayed=[], favorites=JSON.parse(localStorage.getItem("favorites")||"[]"), historyList=JSON.parse(localStorage.getItem("history")||"[]"), currentMovie;
 
-// MOVIES DATA
-let allMovies = [
-  {titre:"Test 1", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/7p0TXW0/rick-morty.jpg", id:"1"},
-  {titre:"Test 2", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png", id:"2"},
-  {titre:"Test 3", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/7p0TXW0/rick-morty.jpg", id:"3"},
-  {titre:"Test 4", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png", id:"4"},
-  {titre:"Test 5", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/7p0TXW0/rick-morty.jpg", id:"5"},
-  {titre:"Test 6", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png", id:"6"},
-  {titre:"Test 7", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/7p0TXW0/rick-morty.jpg", id:"7"},
-  {titre:"Test 8", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png", id:"8"},
-  {titre:"Test 9", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/7p0TXW0/rick-morty.jpg", id:"9"},
-  {titre:"Test 10", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png", id:"10"}
-];
+// SKELETON
+const grid=document.getElementById("grid");
+for(let i=0;i<6;i++){ const s=document.createElement("div"); s.className="skeleton"; grid.appendChild(s); }
 
-let displayed = [];
-let favorites = JSON.parse(localStorage.getItem("favorites")||"[]");
-let historyList = JSON.parse(localStorage.getItem("history")||"[]");
+// FETCH JSON + ANTI CACHE
+fetch("movies.json?"+Date.now())
+.then(r=>r.json())
+.then(data=>{
+  movies=data;
+  displayed=movies;
+  render(displayed);
+});
 
-const grid = document.getElementById("grid");
-const search = document.getElementById("search");
-const playerPage = document.getElementById("playerPage");
-const player = document.getElementById("player");
-const back = document.getElementById("back");
-const header = document.getElementById("header");
-const logo = document.getElementById("logo");
+// LOCALSTORAGE PROGRESS
+function updateProgress(id, percent){ let prog=JSON.parse(localStorage.getItem("progress")||"{}"); prog[id]=percent; localStorage.setItem("progress",JSON.stringify(prog)); }
+function getProgress(id){ let prog=JSON.parse(localStorage.getItem("progress")||"{}"); return prog[id]||0; }
 
-// RENDER FILMS
+// RENDER
 function render(list){
   grid.innerHTML="";
-  if(list.length===0){
-    grid.innerHTML="<div style='text-align:center;padding:50px;color:#ccc;'>Aucun film trouvé</div>";
-    return;
-  }
+  if(list.length===0){ grid.innerHTML="<div style='text-align:center;padding:50px;color:#ccc;'>Aucun film trouvé</div>"; return; }
   list.forEach(m=>{
     const c=document.createElement("div");
     c.className="card";
+    const percent=getProgress(m.id);
     c.innerHTML=`
       <img src="${m.image}">
-      <div class="info">${m.titre}</div>
-      <div class="heart ${favorites.includes(m.id)?'red':''}">${favorites.includes(m.id)?'❤️':'🖤'}</div>
+      <div class="info">
+        <span>${m.titre}</span>
+        <span class="heart ${favorites.includes(m.id)?'red':''}">${favorites.includes(m.id)?'❤️':'🖤'}</span>
+      </div>
+      <div class="progress" style="width:${percent}%"></div>
     `;
     grid.appendChild(c);
 
-    // FAVORIS
-    const heart = c.querySelector(".heart");
-    heart.onclick = e=>{
+    // FAVORI
+    const heart=c.querySelector(".heart");
+    heart.onclick=e=>{
       e.stopPropagation();
-      if(favorites.includes(m.id)){
-        favorites = favorites.filter(f=>f!==m.id);
-      } else favorites.push(m.id);
+      if(favorites.includes(m.id)) favorites=favorites.filter(f=>f!==m.id); else favorites.push(m.id);
       localStorage.setItem("favorites",JSON.stringify(favorites));
-      render(list);
+      render(displayed);
     };
 
-    // PLAYER
-    c.onclick=()=>{
-      openPlayer(m);
-    };
+    c.onclick=()=>openPlayer(m);
   });
 }
 
-// SCROLL INFINI
-let loadIndex=0;
-function loadMore(){
-  if(loadIndex>=allMovies.length) return;
-  const next = allMovies.slice(loadIndex, loadIndex+4);
-  displayed = displayed.concat(next);
+// SEARCH
+document.getElementById("search").oninput=e=>{
+  const q=e.target.value.toLowerCase();
+  displayed=movies.filter(m=>m.titre.toLowerCase().includes(q));
   render(displayed);
-  loadIndex+=4;
-}
-window.addEventListener("scroll",()=>{
-  if(window.innerHeight + window.scrollY >= document.body.offsetHeight-200){
-    loadMore();
-  }
-});
+};
 
-// OPEN PLAYER
+// PLAYER
+const playerPage=document.getElementById("playerPage");
+const player=document.getElementById("player");
 function openPlayer(m){
+  currentMovie=m;
   player.src=m.video;
   playerPage.style.display="flex";
-  header.style.display="none";
-  search.style.display="none";
-  player.play();
+  document.getElementById("logo").style.display="none";
+  document.getElementById("favoritesBtn").style.display="none";
+  document.getElementById("historyBtn").style.display="none";
+
   if(!historyList.includes(m.id)){
     historyList.push(m.id);
     localStorage.setItem("history",JSON.stringify(historyList));
   }
+
+  player.play();
+  const percent=getProgress(m.id);
+  if(percent>0){
+    player.currentTime=(percent/100)*player.duration;
+  }
 }
 
-// BACK TO GRID
-back.onclick=()=>{
+// UPDATE PROGRESS
+player.ontimeupdate=()=>{
+  if(player.src && currentMovie){
+    const percent=Math.floor((player.currentTime/player.duration)*100);
+    updateProgress(currentMovie.id,percent);
+    const card=Array.from(document.querySelectorAll(".card")).find(c=>c.querySelector(".info span").textContent===currentMovie.titre);
+    if(card) card.querySelector(".progress").style.width=percent+"%";
+  }
+}
+
+// REVENIR ACCUEIL
+document.getElementById("logo").onclick=()=>{
   player.pause();
   playerPage.style.display="none";
-  header.style.display="flex";
-  search.style.display="block";
+  document.getElementById("logo").style.display="block";
+  document.getElementById("favoritesBtn").style.display="flex";
+  document.getElementById("historyBtn").style.display="flex";
   render(displayed);
 };
 
-// LOGO -> accueil
-logo.onclick=()=>{
-  player.pause();
-  playerPage.style.display="none";
-  header.style.display="flex";
-  search.style.display="block";
-  displayed=[]; loadIndex=0; loadMore();
-};
+// FAVORIS / HISTORIQUE
+document.getElementById("favoritesBtn").onclick=()=>{ displayed=movies.filter(m=>favorites.includes(m.id)); render(displayed); };
+document.getElementById("historyBtn").onclick=()=>{ displayed=movies.filter(m=>historyList.includes(m.id)); render(displayed); };
 
-// SEARCH
-search.oninput=e=>{
-  const q=e.target.value.toLowerCase();
-  const filtered = allMovies.filter(m=>m.titre.toLowerCase().includes(q));
-  displayed = filtered.slice(0,loadIndex);
-  render(displayed);
-};
-
-// INIT
-loadMore();
 </script>
 </body>
 </html>
