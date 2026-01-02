@@ -6,90 +6,79 @@
 <title>Le0Flix</title>
 
 <style>
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Arial,sans-serif;
-  background:linear-gradient(to bottom,#5b189a,#000);
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:linear-gradient(to bottom,#4b0082,#000);
   color:white;
 }
 
 /* HEADER */
 header{
+  padding:20px;
   text-align:center;
-  padding:25px;
+  position:sticky;
+  top:0;
+  backdrop-filter:blur(15px);
+  background:rgba(0,0,0,.4);
+  z-index:10;
 }
-header img{
-  width:220px;
+header img{width:200px}
+#search{
+  margin-top:15px;
+  width:90%;
+  max-width:400px;
+  padding:12px 18px;
+  border-radius:20px;
+  border:none;
+  outline:none;
 }
+#settings{margin-top:10px}
 
 /* GRID */
-#movies-grid{
+#movies{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:15px;
-  padding:15px;
+  padding:20px;
 }
-.movie-card{
+.movie{
   border-radius:15px;
   overflow:hidden;
-  position:relative;
+  background:rgba(255,255,255,.1);
   cursor:pointer;
 }
-.movie-card img{
+.movie img{
   width:100%;
   display:block;
 }
-.movie-overlay{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  background:rgba(0,0,0,.6);
+.info{
   padding:10px;
+  backdrop-filter:blur(10px);
 }
+.info h3{margin:0;font-size:16px}
+.info span{font-size:13px;opacity:.7}
 
-/* PAGE FILM */
-#movie-page,#player-page{
+/* PLAYER PAGE */
+#playerPage{
+  display:none;
   position:fixed;
   inset:0;
   background:black;
-  display:none;
-  flex-direction:column;
-  z-index:1000;
+  z-index:20;
 }
-.top-bar{
-  height:50px;
-  display:flex;
-  align-items:center;
-  padding:10px;
+#back{
+  position:absolute;
+  top:15px;
+  left:15px;
+  font-size:26px;
+  cursor:pointer;
 }
-.back-btn{
-  font-size:24px;
-  background:none;
-  border:none;
-  color:white;
-}
-#movie-content{
-  text-align:center;
-  padding:20px;
-}
-#movie-content img{
-  width:220px;
-  border-radius:15px;
-}
-#play-btn{
-  margin-top:20px;
-  padding:15px 30px;
-  font-size:18px;
-  background:#8a2be2;
-  border:none;
-  border-radius:30px;
-  color:white;
-}
-
-/* PLAYER */
-#player-video{
+video{
   width:100%;
-  height:calc(100vh - 50px);
+  height:100%;
+  object-fit:contain;
 }
 </style>
 </head>
@@ -98,86 +87,65 @@ header img{
 
 <header>
   <img src="https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png">
+  <br>
+  <input id="search" placeholder="Rechercher un film...">
 </header>
 
-<div id="movies-grid"></div>
-
-<!-- MENU FILM -->
-<div id="movie-page">
-  <div class="top-bar">
-    <button class="back-btn" id="back-to-grid">←</button>
-  </div>
-  <div id="movie-content">
-    <img id="movie-img">
-    <h2 id="movie-title"></h2>
-    <p id="movie-duration"></p>
-    <button id="play-btn">▶ Lecture</button>
-  </div>
-</div>
+<div id="movies"></div>
 
 <!-- PLAYER -->
-<div id="player-page">
-  <div class="top-bar">
-    <button class="back-btn" id="back-to-movie">←</button>
-  </div>
-  <video id="player-video" controls></video>
+<div id="playerPage">
+  <div id="back">←</div>
+  <video id="player" controls></video>
 </div>
 
 <script>
-let movies=[];
-let currentMovie=null;
+let moviesData = [];
+const grid = document.getElementById("movies");
+const search = document.getElementById("search");
+const playerPage = document.getElementById("playerPage");
+const player = document.getElementById("player");
 
-fetch("movies.json")
-.then(r=>r.json())
-.then(data=>{
-  movies=data;
-  render();
+fetch("movies.json?v=" + Date.now())
+.then(r => r.json())
+.then(data => {
+  moviesData = data;
+  render(data);
 });
 
-function render(){
-  const grid=document.getElementById("movies-grid");
+function render(list){
   grid.innerHTML="";
-  movies.forEach(movie=>{
-    const card=document.createElement("div");
-    card.className="movie-card";
-    card.innerHTML=`
-      <img src="${movie.image}">
-      <div class="movie-overlay">
-        <strong>${movie.titre}</strong><br>${movie.duree}
-      </div>
-    `;
-    card.onclick=()=>openMovie(movie);
-    grid.appendChild(card);
+  list.forEach(m=>{
+    const div=document.createElement("div");
+    div.className="movie";
+    div.innerHTML=`
+      <img src="${m.image}">
+      <div class="info">
+        <h3>${m.titre}</h3>
+        <span>${m.duree}</span>
+      </div>`;
+    div.onclick=()=>openPlayer(m.video);
+    grid.appendChild(div);
   });
 }
 
-function openMovie(movie){
-  currentMovie=movie;
-  document.getElementById("movies-grid").style.display="none";
-  document.getElementById("movie-page").style.display="flex";
-  document.getElementById("movie-img").src=movie.image;
-  document.getElementById("movie-title").textContent=movie.titre;
-  document.getElementById("movie-duration").textContent=movie.duree;
+search.oninput=()=>{
+  const q=search.value.toLowerCase();
+  render(moviesData.filter(m=>m.titre.toLowerCase().includes(q)));
+};
+
+function openPlayer(src){
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  player.src = src;
+  player.load();
+  playerPage.style.display="block";
 }
 
-document.getElementById("play-btn").onclick=()=>{
-  document.getElementById("movie-page").style.display="none";
-  document.getElementById("player-page").style.display="flex";
-  const v=document.getElementById("player-video");
-  v.src=currentMovie.lien;
-  v.play();
-};
-
-document.getElementById("back-to-grid").onclick=()=>{
-  document.getElementById("movie-page").style.display="none";
-  document.getElementById("movies-grid").style.display="grid";
-};
-
-document.getElementById("back-to-movie").onclick=()=>{
-  const v=document.getElementById("player-video");
-  v.pause();
-  document.getElementById("player-page").style.display="none";
-  document.getElementById("movie-page").style.display="flex";
+document.getElementById("back").onclick=()=>{
+  player.pause();
+  playerPage.style.display="none";
 };
 </script>
 
