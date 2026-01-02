@@ -3,150 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Le0Flix</title>
-
+<title>Le0flix</title>
 <style>
-*{box-sizing:border-box}
-body{
+body {
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-  background:linear-gradient(to bottom,#4b0082,#000);
-  color:white;
+  font-family: -apple-system, BlinkMacSystemFont,'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #5a0bc3, #000);
+  color: #fff;
+  overflow-x: hidden;
 }
-
-/* HEADER */
-header{
+header {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
   padding:20px;
-  text-align:center;
-  position:sticky;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  position: sticky;
   top:0;
-  backdrop-filter:blur(15px);
-  background:rgba(0,0,0,.4);
   z-index:10;
 }
-header img{width:200px}
-#search{
-  margin-top:15px;
+#logo {
+  max-width:220px;
+  margin-bottom:10px;
+}
+#search {
+  padding:10px 15px;
+  border-radius:25px;
+  border:none;
   width:90%;
   max-width:400px;
-  padding:12px 18px;
-  border-radius:20px;
-  border:none;
+  background: rgba(255,255,255,0.1);
+  color:#fff;
   outline:none;
 }
-#settings{margin-top:10px}
-
-/* GRID */
-#movies{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
-  padding:20px;
-}
-.movie{
-  border-radius:15px;
-  overflow:hidden;
-  background:rgba(255,255,255,.1);
+#settings {
+  position:absolute;
+  top:15px;
+  right:15px;
+  padding:8px 12px;
+  border-radius:20px;
+  background: rgba(255,255,255,0.1);
   cursor:pointer;
 }
-.movie img{
+#movies-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
+  gap:20px;
+  padding:20px;
+}
+.movie-card {
+  position:relative;
+  border-radius:15px;
+  overflow:hidden;
+  cursor:pointer;
+  background: rgba(255,255,255,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.movie-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.movie-card img {
   width:100%;
   display:block;
 }
-.info{
+.movie-overlay {
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  background: rgba(0,0,0,0.6);
+  text-align:center;
   padding:10px;
-  backdrop-filter:blur(10px);
 }
-.info h3{margin:0;font-size:16px}
-.info span{font-size:13px;opacity:.7}
-
-/* PLAYER PAGE */
-#playerPage{
+.movie-title {font-size:16px;font-weight:600;}
+.movie-duration {font-size:12px;color:#ccc;}
+#video-modal {
   display:none;
   position:fixed;
-  inset:0;
-  background:black;
-  z-index:20;
+  top:0;left:0;width:100%;height:100%;
+  background: rgba(0,0,0,0.9);
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:1000;
 }
-#back{
-  position:absolute;
-  top:15px;
-  left:15px;
-  font-size:26px;
+#video-modal video {width:90%;max-width:800px; border-radius:15px;}
+#back-btn {
+  margin:15px;
+  align-self:flex-start;
+  margin-left:5%;
+  padding:8px 15px;
+  border:none;
+  border-radius:15px;
+  background: rgba(255,255,255,0.2);
+  color:#fff;
   cursor:pointer;
 }
-video{
-  width:100%;
-  height:100%;
-  object-fit:contain;
+@media(max-width:600px){
+  #movies-grid{grid-template-columns:1fr 1fr;}
+  #logo{max-width:180px;}
 }
 </style>
 </head>
-
 <body>
 
 <header>
-  <img src="https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png">
-  <br>
-  <input id="search" placeholder="Rechercher un film...">
+  <img id="logo" src="https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png" alt="Le0flix">
+  <input type="text" id="search" placeholder="Rechercher un film...">
+  <button id="settings">⚙️</button>
 </header>
 
-<div id="movies"></div>
+<div id="movies-grid"></div>
 
-<!-- PLAYER -->
-<div id="playerPage">
-  <div id="back">←</div>
-  <video id="player" controls></video>
+<div id="video-modal" class="flex">
+  <button id="back-btn">← Retour</button>
+  <video id="video-player" controls></video>
 </div>
 
 <script>
-let moviesData = [];
-const grid = document.getElementById("movies");
-const search = document.getElementById("search");
-const playerPage = document.getElementById("playerPage");
-const player = document.getElementById("player");
+let movies = [];
 
-fetch("movies.json?v=" + Date.now())
-.then(r => r.json())
-.then(data => {
-  moviesData = data;
-  render(data);
+fetch('movies.json')
+.then(r=>r.json())
+.then(data=>{
+  movies = data;
+  renderMovies(movies);
 });
 
-function render(list){
-  grid.innerHTML="";
-  list.forEach(m=>{
-    const div=document.createElement("div");
-    div.className="movie";
-    div.innerHTML=`
-      <img src="${m.image}">
-      <div class="info">
-        <h3>${m.titre}</h3>
-        <span>${m.duree}</span>
+function renderMovies(list){
+  const grid = document.getElementById('movies-grid');
+  grid.innerHTML='';
+  list.forEach(movie=>{
+    const card = document.createElement('div');
+    card.className='movie-card';
+    card.innerHTML=`
+      <img src="${movie.image}" alt="${movie.titre}">
+      <div class="movie-overlay">
+        <div class="movie-title">${movie.titre}</div>
+        <div class="movie-duration">${movie.duree}</div>
       </div>`;
-    div.onclick=()=>openPlayer(m.video);
-    grid.appendChild(div);
+    grid.appendChild(card);
+
+    card.onclick=()=>{
+      const modal=document.getElementById('video-modal');
+      const player=document.getElementById('video-player');
+      player.src=movie.lien;
+      modal.style.display='flex';
+    }
   });
 }
 
-search.oninput=()=>{
-  const q=search.value.toLowerCase();
-  render(moviesData.filter(m=>m.titre.toLowerCase().includes(q)));
-};
+// Recherche
+document.getElementById('search').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  const filtered=movies.filter(m=>m.titre.toLowerCase().includes(q));
+  renderMovies(filtered);
+});
 
-function openPlayer(src){
+// Retour vidéo
+document.getElementById('back-btn').addEventListener('click',()=>{
+  const modal=document.getElementById('video-modal');
+  const player=document.getElementById('video-player');
   player.pause();
-  player.removeAttribute("src");
-  player.load();
-  player.src = src;
-  player.load();
-  playerPage.style.display="block";
-}
-
-document.getElementById("back").onclick=()=>{
-  player.pause();
-  playerPage.style.display="none";
-};
+  player.src='';
+  modal.style.display='none';
+});
 </script>
 
 </body>
