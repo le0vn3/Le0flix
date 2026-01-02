@@ -6,120 +6,90 @@
 <title>Le0Flix</title>
 
 <style>
-*{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Arial, sans-serif;
-  background:linear-gradient(to bottom,#4b0082,#000);
-  color:#fff;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(to bottom,#5b189a,#000);
+  color:white;
 }
 
 /* HEADER */
 header{
-  padding:20px;
   text-align:center;
-  position:sticky;
-  top:0;
-  backdrop-filter:blur(15px);
-  background:rgba(0,0,0,.4);
-  z-index:10;
+  padding:25px;
 }
-#logo{max-width:240px}
-#search{
-  margin-top:15px;
-  padding:12px 18px;
-  width:90%;
-  max-width:450px;
-  border-radius:25px;
-  border:none;
-  outline:none;
-}
-
-/* SETTINGS */
-#settings{
-  position:absolute;
-  top:20px;
-  right:20px;
-  padding:10px 14px;
-  border-radius:20px;
-  border:none;
-  cursor:pointer;
+header img{
+  width:220px;
 }
 
 /* GRID */
 #movies-grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:16px;
-  padding:20px;
-  max-width:1200px;
-  margin:auto;
+  gap:15px;
+  padding:15px;
 }
-
-/* CARD */
 .movie-card{
-  position:relative;
-  border-radius:18px;
+  border-radius:15px;
   overflow:hidden;
-  background:#111;
+  position:relative;
   cursor:pointer;
 }
-.movie-card img,
-.movie-card video{
+.movie-card img{
   width:100%;
-  height:260px;
-  object-fit:cover;
   display:block;
 }
-.movie-card video{
-  position:absolute;
-  inset:0;
-  display:none;
-}
-
-/* HOVER VIDEO */
-.movie-card:hover video{
-  display:block;
-}
-.movie-card:hover img{
-  display:none;
-}
-
-/* OVERLAY TEXT */
-.movie-info{
+.movie-overlay{
   position:absolute;
   bottom:0;
   width:100%;
-  padding:12px;
-  background:linear-gradient(to top,rgba(0,0,0,.9),transparent);
-}
-.movie-title{
-  font-weight:600;
-}
-.movie-duration{
-  font-size:13px;
-  opacity:.8;
+  background:rgba(0,0,0,.6);
+  padding:10px;
 }
 
-/* MODAL VIDEO */
-#video-modal{
-  display:none;
+/* PAGE FILM */
+#movie-page,#player-page{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.85);
-  justify-content:center;
-  align-items:center;
+  background:black;
+  display:none;
+  flex-direction:column;
+  z-index:1000;
 }
-#video-modal video{
-  width:90%;
-  max-width:900px;
+.top-bar{
+  height:50px;
+  display:flex;
+  align-items:center;
+  padding:10px;
+}
+.back-btn{
+  font-size:24px;
+  background:none;
+  border:none;
+  color:white;
+}
+#movie-content{
+  text-align:center;
+  padding:20px;
+}
+#movie-content img{
+  width:220px;
+  border-radius:15px;
+}
+#play-btn{
+  margin-top:20px;
+  padding:15px 30px;
+  font-size:18px;
+  background:#8a2be2;
+  border:none;
+  border-radius:30px;
+  color:white;
 }
 
-/* DESKTOP */
-@media(min-width:900px){
-  #movies-grid{
-    grid-template-columns:repeat(4,1fr);
-  }
+/* PLAYER */
+#player-video{
+  width:100%;
+  height:calc(100vh - 50px);
 }
 </style>
 </head>
@@ -127,71 +97,88 @@ header{
 <body>
 
 <header>
-  <img id="logo" src="https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png">
-  <input id="search" placeholder="Rechercher un film...">
-  <button id="settings">⚙️</button>
+  <img src="https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png">
 </header>
 
 <div id="movies-grid"></div>
 
-<div id="video-modal">
-  <video id="player" controls></video>
+<!-- MENU FILM -->
+<div id="movie-page">
+  <div class="top-bar">
+    <button class="back-btn" id="back-to-grid">←</button>
+  </div>
+  <div id="movie-content">
+    <img id="movie-img">
+    <h2 id="movie-title"></h2>
+    <p id="movie-duration"></p>
+    <button id="play-btn">▶ Lecture</button>
+  </div>
+</div>
+
+<!-- PLAYER -->
+<div id="player-page">
+  <div class="top-bar">
+    <button class="back-btn" id="back-to-movie">←</button>
+  </div>
+  <video id="player-video" controls></video>
 </div>
 
 <script>
 let movies=[];
-const grid=document.getElementById("movies-grid");
-const search=document.getElementById("search");
-const modal=document.getElementById("video-modal");
-const player=document.getElementById("player");
+let currentMovie=null;
 
-/* LOAD JSON */
 fetch("movies.json")
 .then(r=>r.json())
 .then(data=>{
   movies=data;
-  render(movies);
+  render();
 });
 
-function render(list){
+function render(){
+  const grid=document.getElementById("movies-grid");
   grid.innerHTML="";
-  list.forEach(m=>{
+  movies.forEach(movie=>{
     const card=document.createElement("div");
     card.className="movie-card";
     card.innerHTML=`
-      <img src="${m.image}">
-      <video muted preload="none">
-        <source src="${m.lien}" type="video/mp4">
-      </video>
-      <div class="movie-info">
-        <div class="movie-title">${m.titre}</div>
-        <div class="movie-duration">${m.duree}</div>
+      <img src="${movie.image}">
+      <div class="movie-overlay">
+        <strong>${movie.titre}</strong><br>${movie.duree}
       </div>
     `;
+    card.onclick=()=>openMovie(movie);
     grid.appendChild(card);
-
-    const v=card.querySelector("video");
-    card.onmouseenter=()=>v.play().catch(()=>{});
-    card.onmouseleave=()=>{v.pause();v.currentTime=0;}
-
-    card.onclick=()=>{
-      player.src=m.lien;
-      modal.style.display="flex";
-    }
   });
 }
 
-/* SEARCH */
-search.oninput=()=>{
-  const q=search.value.toLowerCase();
-  render(movies.filter(m=>m.titre.toLowerCase().includes(q)));
+function openMovie(movie){
+  currentMovie=movie;
+  document.getElementById("movies-grid").style.display="none";
+  document.getElementById("movie-page").style.display="flex";
+  document.getElementById("movie-img").src=movie.image;
+  document.getElementById("movie-title").textContent=movie.titre;
+  document.getElementById("movie-duration").textContent=movie.duree;
 }
 
-/* CLOSE VIDEO */
-modal.onclick=()=>{
-  modal.style.display="none";
-  player.pause();
-}
+document.getElementById("play-btn").onclick=()=>{
+  document.getElementById("movie-page").style.display="none";
+  document.getElementById("player-page").style.display="flex";
+  const v=document.getElementById("player-video");
+  v.src=currentMovie.lien;
+  v.play();
+};
+
+document.getElementById("back-to-grid").onclick=()=>{
+  document.getElementById("movie-page").style.display="none";
+  document.getElementById("movies-grid").style.display="grid";
+};
+
+document.getElementById("back-to-movie").onclick=()=>{
+  const v=document.getElementById("player-video");
+  v.pause();
+  document.getElementById("player-page").style.display="none";
+  document.getElementById("movie-page").style.display="flex";
+};
 </script>
 
 </body>
