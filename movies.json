@@ -1,13 +1,13 @@
 [
   {
-    "titre": "Test 1",
+    "titre": "Test Film 1",
     "lien": "https://www.dropbox.com/scl/fi/u9oex6blnmpmwem1s4wdx/20260102_033901.mp4?raw=1",
-    "duree": "2h00",
+    "duree": "2h23",
     "image": "https://i.ibb.co/WSYGkWV/t-l-chargement.png"
   },
   {
-    "titre": "Film Test 2",
-    "lien": "https://www.dropbox.com/s/xyz123456789/AutreFilm.mp4?raw=1",
+    "titre": "Test Film 2",
+    "lien": "https://www.dropbox.com/scl/fi/u9oex6blnmpmwem1s4wdx/20260102_033901.mp4?raw=1",
     "duree": "1h50",
     "image": "https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png"
   }
