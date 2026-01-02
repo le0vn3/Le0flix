@@ -1,26 +1,23 @@
 [
   {
-    "titre": "Avengers Endgame",
-    "duree": "3h01",
-    "image": "https://i.ibb.co/WSYGkWV/avengers.png",
-    "lien": "https://drive.google.com/uc?export=download&id=ID_AVENGERS"
+    "id": "zootopie",
+    "titre": "Zootopie",
+    "duree": "1h48",
+    "image": "https://i.ibb.co/WSYGkWV/t-l-chargement.png",
+    "video": "https://drive.google.com/uc?export=download&id=ID_ZOOTOPIE&v=1"
   },
   {
-    "titre": "test",
-    "duree": "1h50",
-    "image": "https://i.ibb.co/WSYGkWV/zootopie.png",
-    "lien": "https://drive.google.com/uc?export=download&id=1IID8ghqUKc3E2NslcpKB2wrWjXDrCCS6"
+    "id": "avengers",
+    "titre": "Avengers",
+    "duree": "2h23",
+    "image": "https://i.ibb.co/T8zZfg7/spiderman.jpg",
+    "video": "https://drive.google.com/uc?export=download&id=ID_AVENGERS&v=1"
   },
   {
-    "titre": "Spider-Man No Way Home",
-    "duree": "2h28",
-    "image": "https://i.ibb.co/WSYGkWV/spiderman.png",
-    "lien": "https://drive.google.com/uc?export=download&id=ID_SPIDER"
-  },
-  {
-    "titre": "Rick et Morty S01E01",
+    "id": "rickmorty",
+    "titre": "Rick et Morty S1E1",
     "duree": "23 min",
-    "image": "https://i.ibb.co/WSYGkWV/rickmorty.png",
-    "lien": "https://drive.google.com/uc?export=download&id=ID_RM1"
+    "image": "https://i.ibb.co/7p0TXW0/rick-morty.jpg",
+    "video": "https://drive.google.com/uc?export=download&id=ID_RM1&v=1"
   }
 ]
