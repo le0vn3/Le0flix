@@ -3,250 +3,180 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Le0Flix</title>
+<title>Le0Flix Animé</title>
 <style>
 :root{
   --bg1:#1b0836;
   --bg2:#2d0b59;
   --bg3:#000;
-  --accent:#8a2be2;
-  --fav:#e74c3c;
+  --primary:#8a2be2;
 }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:system-ui, sans-serif;background:linear-gradient(to bottom,var(--bg1),var(--bg2),var(--bg3));color:#fff;min-height:100vh;overflow-x:hidden;}
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui;}
-
-body{
-  background:linear-gradient(to bottom,var(--bg1),var(--bg2),var(--bg3));
-  color:#fff;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-
-/* LOADING SCREEN */
+/* SCREEN LOADING */
 #loadingScreen{
-  position:fixed; inset:0; background:#000;
-  display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999;
+  position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#000;z-index:999;flex-direction:column;
+  animation:fadeOut 0.5s forwards;
 }
-#loadingScreen img{width:150px;margin-bottom:20px;animation:fadein 1s ease-in-out infinite alternate;}
-@keyframes fadein{0%{opacity:0.3;}100%{opacity:1;}}
+#loadingScreen img{height:120px;animation:logoAnim 2s infinite alternate;}
+@keyframes logoAnim{0%{transform:scale(0.9)}100%{transform:scale(1.1)}}
+@keyframes fadeOut{0%{opacity:1}100%{opacity:0;display:none}}
 
 /* HEADER */
 header{
-  position:fixed; top:0; left:0; right:0;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 12px; gap:10px; z-index:1000;
-  background: linear-gradient(to bottom,rgba(0,0,0,0.95),transparent);
+  display:flex;align-items:center;justify-content:space-between;padding:10px 20px;position:sticky;top:0;background:var(--bg1);z-index:100;transition:all 0.3s ease;
 }
-header img{height:60px;}
-#search{flex:1; min-width:0; padding:8px 12px; border-radius:20px; border:none; font-size:14px;}
-#actions{display:flex; gap:8px; flex-shrink:0;}
-button.action-btn{
-  background:var(--accent); color:#fff; border:none; border-radius:8px; padding:5px 8px; font-size:12px; cursor:pointer;
-}
+header img#logo{height:80px;cursor:pointer;transition:all 0.3s ease;}
+.header-buttons{display:flex;align-items:center;gap:10px;}
+.header-buttons div{cursor:pointer;font-size:22px;user-select:none;transition:transform 0.2s;}
+.header-buttons div:hover{transform:scale(1.2);}
+
+/* SEARCH */
+#search{width:90%;max-width:500px;margin:10px auto 20px;display:block;padding:12px 18px;border-radius:25px;border:none;font-size:16px;}
 
 /* GRID */
-#grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:12px;
-  padding:80px 15px 15px 15px; /* padding top pour header */
-}
-@media(min-width:480px){#grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));}}
-@media(min-width:768px){#grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}}
-
-.card{
-  border-radius:12px; overflow:hidden; position:relative; cursor:pointer; background: rgba(255,255,255,0.05);
-}
-.card img{width:100%; aspect-ratio:2/3; object-fit:cover;}
-.card .info{
-  position:absolute; bottom:0; width:100%; background: linear-gradient(to top, rgba(0,0,0,0.8),transparent);
-  padding:6px; font-size:12px; display:flex; justify-content:space-between; align-items:center;
-}
-.card .fav{
-  width:18px; height:18px; cursor:pointer; fill:black; transition:0.2s;
-}
-
-/* PROGRESS BAR */
-.card .progress-bar{
-  position:absolute;
-  bottom:0;
-  left:0;
-  height:4px;
-  background:var(--fav);
-  width:0%;
-}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;padding:20px;}
+.card{border-radius:14px;overflow:hidden;position:relative;cursor:pointer;background:#111;animation:fadeIn 0.5s;}
+.card img{width:100%;height:100%;object-fit:cover;}
+.card .info{position:absolute;bottom:0;width:100%;padding:6px;font-size:13px;background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);}
+.card .heart{position:absolute;top:6px;right:6px;font-size:20px;color:black;cursor:pointer;transition:color 0.3s;}
+.card .heart.red{color:red;}
 
 /* SKELETON */
-.skeleton{
-  background: linear-gradient(90deg,#222,#333,#222);
-  background-size:200% 100%;
-  animation: shimmer 1.4s infinite;
-  aspect-ratio:2/3; border-radius:12px;
-}
-@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.skeleton{background: linear-gradient(90deg,#222,#333,#222);background-size:200% 100%;animation: shimmer 1.2s infinite;aspect-ratio:2/3;border-radius:14px;}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
 
 /* PLAYER */
-#playerPage{
-  display:none; position:fixed; inset:0; background:#000; z-index:10;
-  justify-content:center; align-items:center; flex-direction:column;
-}
-#back{
-  position:absolute; top:10px; left:10px; font-size:18px; cursor:pointer; color:#fff; z-index:11;
-}
-#playerPage video{
-  width:95%; max-height:60vh;
-}
+#playerPage{display:none;position:fixed;inset:0;background:#000;z-index:50;flex-direction:column;align-items:center;justify-content:center;}
+#back{padding:10px;font-size:22px;cursor:pointer;color:white;position:absolute;top:10px;left:10px;z-index:51;}
+video#player{width:100%;height:100%;object-fit:contain;}
 
-/* PLAYER LOADING */
-#playerLoading{
-  display:none; position:fixed; inset:0; background:#000; justify-content:center; align-items:center; z-index:11; flex-direction:column;
+/* RESPONSIVE */
+@media(max-width:768px){
+  header img#logo{height:60px;}
+  #grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
 }
-#playerLoading img{width:100px;margin-bottom:10px;animation:fadein 1s ease-in-out infinite alternate;}
 </style>
 </head>
 <body>
 
-<!-- Écran de lancement -->
+<!-- LOADING SCREEN -->
 <div id="loadingScreen">
-  <img src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png" alt="Logo">
-  <div>Chargement...</div>
+  <img src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png">
 </div>
 
-<header>
-  <img src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png" alt="Logo">
-  <input type="text" id="search" placeholder="Rechercher un film...">
-  <div id="actions">
-    <button class="action-btn" id="favBtn">Favoris</button>
-    <button class="action-btn" id="histBtn">Historique</button>
+<header id="header">
+  <img id="logo" src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png" alt="Logo">
+  <div class="header-buttons">
+    <div id="favBtn">❤️</div>
+    <div id="histBtn">🕒</div>
   </div>
 </header>
 
-<div id="grid">
-  <div class="skeleton"></div>
-  <div class="skeleton"></div>
-  <div class="skeleton"></div>
-  <div class="skeleton"></div>
-</div>
+<input id="search" placeholder="Rechercher un film...">
+
+<div id="grid"></div>
 
 <!-- PLAYER -->
 <div id="playerPage">
   <div id="back">⬅ Retour</div>
-  <div id="playerLoading">
-    <img src="https://i.ibb.co/5gT8z3DB/Black-White-Bold-Modern-Studio-Logo-20260102-135638-0000-removebg-preview.png" alt="Logo">
-    <div>Chargement vidéo...</div>
-  </div>
   <video id="player" controls playsinline></video>
 </div>
 
 <script>
+// INIT LOADING SCREEN
+setTimeout(()=>{document.getElementById("loadingScreen").style.display="none";},4000);
+
+// DATA JSON TEST
+let movies = [
+  {titre:"Test 1", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/7p0TXW0/rick-morty.jpg", id:"1"},
+  {titre:"Test 2", video:"https://cdn.streamable.com/video/mp4/mqblfv.mp4", image:"https://i.ibb.co/DgKW2C56/Black-White-Bold-Modern-Studio-Logo-20260101-135423-0000-removebg-preview.png", id:"2"}
+];
+
+let favorites = JSON.parse(localStorage.getItem("favorites")||"[]");
+let historyList = JSON.parse(localStorage.getItem("history")||"[]");
+
 const grid = document.getElementById("grid");
+const search = document.getElementById("search");
 const playerPage = document.getElementById("playerPage");
 const player = document.getElementById("player");
-const search = document.getElementById("search");
-const favBtn = document.getElementById("favBtn");
-const histBtn = document.getElementById("histBtn");
-const loadingScreen = document.getElementById("loadingScreen");
-const playerLoading = document.getElementById("playerLoading");
+const back = document.getElementById("back");
+const header = document.getElementById("header");
+const logo = document.getElementById("logo");
 
-let movies=[], favorites=[], history=[], progress={};
-
-/* Écran d'accueil 4s */
-window.addEventListener("load",()=>{
-  setTimeout(()=>{loadingScreen.style.display="none";},4000);
-});
-
-/* FETCH JSON ANTI-CACHE */
-fetch("movies.json?"+Date.now())
-.then(r=>r.json())
-.then(data=>{
-  movies=data;
-  render(movies);
-});
-
-/* RENDER CARDS */
 function render(list){
   grid.innerHTML="";
   if(list.length===0){
-    grid.innerHTML="<div style='text-align:center;padding:20px;'>Aucun film trouvé</div>";
+    grid.innerHTML="<div style='text-align:center;padding:50px;color:#ccc;'>Aucun film trouvé</div>";
     return;
   }
   list.forEach(m=>{
     const c = document.createElement("div");
     c.className="card";
     c.innerHTML=`
-      <img src="${m.image}" alt="${m.titre}">
-      <div class="info">
-        <span>${m.titre} • ${m.duree}</span>
-        <svg class="fav" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
-          4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 
-          19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-      </div>
-      <div class="progress-bar"></div>
+      <img src="${m.image}">
+      <div class="info">${m.titre}</div>
+      <div class="heart ${favorites.includes(m.id)?'red':''}">${favorites.includes(m.id)?'❤️':'🖤'}</div>
     `;
     grid.appendChild(c);
 
-    const favIcon = c.querySelector(".fav");
-    const progBar = c.querySelector(".progress-bar");
-
-    // Progression
-    if(progress[m.titre]) progBar.style.width = progress[m.titre]+"%";
-
-    // Favoris
-    if(favorites.includes(m.titre)) favIcon.style.fill="var(--fav)";
-    favIcon.onclick = (e)=>{
+    // FAVORIS
+    const heart = c.querySelector(".heart");
+    heart.onclick = e=>{
       e.stopPropagation();
-      if(favorites.includes(m.titre)){
-        favorites = favorites.filter(f=>f!==m.titre);
-        favIcon.style.fill="black";
-      }else{
-        favorites.push(m.titre);
-        favIcon.style.fill="var(--fav)";
-      }
+      if(favorites.includes(m.id)){
+        favorites = favorites.filter(f=>f!==m.id);
+      } else favorites.push(m.id);
+      localStorage.setItem("favorites",JSON.stringify(favorites));
+      render(list);
     };
 
-    // Ouvrir vidéo
-    c.onclick = ()=>{
-      playerLoading.style.display="flex";
-      playerPage.style.display="flex";
-      setTimeout(()=>{
-        openPlayer(m);
-        playerLoading.style.display="none";
-      },500);
-      if(!history.includes(m.titre)) history.push(m.titre);
+    // CLICK FILM
+    c.onclick=()=>{
+      openPlayer(m);
     };
   });
 }
 
-/* SEARCH */
-search.oninput = e=>{
-  const q = e.target.value.toLowerCase();
-  if(q==="") render(movies);
-  else render(movies.filter(m=>m.titre.toLowerCase().includes(q)));
-};
-
-/* PLAYER */
+// PLAYER
 function openPlayer(m){
-  player.src = m.video;
+  player.src=m.video;
+  playerPage.style.display="flex";
+  header.style.display="none";
   player.play();
-  // Mettre à jour la progression
-  player.ontimeupdate = ()=>{
-    progress[m.titre] = Math.floor((player.currentTime/player.duration)*100);
-    const card = [...document.querySelectorAll(".card")].find(c=>c.querySelector("span").innerText.includes(m.titre));
-    if(card) card.querySelector(".progress-bar").style.width = progress[m.titre]+"%";
+
+  // HISTORIQUE
+  if(!historyList.includes(m.id)){
+    historyList.push(m.id);
+    localStorage.setItem("history",JSON.stringify(historyList));
   }
 }
 
-document.getElementById("back").onclick = ()=>{
+// BACK
+back.onclick=()=>{
   player.pause();
   playerPage.style.display="none";
+  header.style.display="flex";
 };
 
-/* Favoris & Historique */
-favBtn.onclick = ()=>{ render(movies.filter(m=>favorites.includes(m.titre))); };
-histBtn.onclick = ()=>{ render(movies.filter(m=>history.includes(m.titre))); };
+// LOGO -> menu principal
+logo.onclick=()=>{
+  player.pause();
+  playerPage.style.display="none";
+  header.style.display="flex";
+  render(movies);
+};
 
+// SEARCH
+search.oninput=e=>{
+  const q=e.target.value.toLowerCase();
+  render(movies.filter(m=>m.titre.toLowerCase().includes(q)));
+};
+
+// INIT
+render(movies);
 </script>
 </body>
 </html>
